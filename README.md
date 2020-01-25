@@ -128,6 +128,7 @@ The following example track event for the key `header.burgerMenu_onClick` with d
 The following example track event for the key `header.burgerMenu_onClick`.
 
 ```javascript
+const configTracking = require('./config-tracking');
 const TrackingManager = require('tracking-manager');
 
 const trackingManager = new TrackingManager({
@@ -142,6 +143,7 @@ trackingManager.trackEvent('header.burgerMenu_onClick');
 The following example track event for the key `header.burgerMenu_onClick` with dynamic variable `{isConnected}`.
 
 ```javascript
+const configTracking = require('./config-tracking');
 const TrackingManager = require('tracking-manager');
 
 const trackingManager = new TrackingManager({
@@ -168,6 +170,7 @@ The following example track page view for the key `newsInfiniteScroll` with dyna
 ```
 
 ```javascript
+const configTracking = require('./config-tracking');
 const TrackingManager = require('tracking-manager');
 
 const trackingManager = new TrackingManager({
@@ -187,7 +190,6 @@ Debug option is available on initialize to log all tracking in the devtools.
 const TrackingManager = require('tracking-manager');
 
 const trackingManager = new TrackingManager({
-    config: configTracking,
     debug: true
 });
 ```
