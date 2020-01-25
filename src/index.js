@@ -224,10 +224,23 @@ module.exports = class Tracking {
 		}
 	}
 
+	/**
+	 * Check if Google Analytics is available on the page
+	 *
+	 * @return {Boolean} Is Google Analytics available
+	 */
 	isGoogleAnalyticsAvailable () {
 		return typeof window.ga !== 'undefined';
 	}
 
+	/**
+	 * Transform key with dots notation into object keys with deep levels
+	 * Then, search in the object tracking configuration
+	 *
+	 * @param {String} key Tracking configuration key
+	 *
+	 * @return {Object} Tracking configuration datas
+	 */
 	getConfigEventFromKey (key) {
 		return key
 			.split('.')
