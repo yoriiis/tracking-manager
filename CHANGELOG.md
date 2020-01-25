@@ -4,4 +4,4 @@
 
 ### New features
 
-* First release of `npmPackageBoilerplate` 🚀
+* First release of `tracking-manager` 🚀

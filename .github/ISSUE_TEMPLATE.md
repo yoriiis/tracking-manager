@@ -30,9 +30,9 @@ Please include any additional information necessary here. Including the followin
 
 ### versions
 
-#### npmPackageBoilerplate
+#### tracking-manager
 
-What version of `npmPackageBoilerplate` does this occur with?
+What version of `tracking-manager` does this occur with?
 
 #### Browsers
 
