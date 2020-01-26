@@ -77,7 +77,7 @@ beforeEach(() => {
 		writable: true,
 		value: {
 			assign: () => {},
-			href: 'http://www.google.fr'
+			href: 'http://localhost/'
 		}
 	});
 
@@ -358,7 +358,7 @@ describe('TrackingManager function', () => {
 	});
 
 	it('Initialize the sendEvent function with hit callback', () => {
-		const callbackUrl = 'http://www.google.fr';
+		const callbackUrl = 'http://localhost/';
 
 		jsonEvent.hitCallback = () => {
 			window.location.assign(callbackUrl);
