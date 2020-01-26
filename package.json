@@ -16,12 +16,17 @@
 	"author": "Yoriiis aka Joris DANIEL",
 	"main": "src/index.js",
 	"scripts": {
+		"coverage": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
+		"test": "jest",
+		"test:coverage": "jest --coverage",
 		"test:eslint": "eslint -c ./.eslintrc.js .",
-		"test:markdown": "markdownlint '**/*.md' --ignore node_modules"
+		"test:markdown": "markdownlint '**/*.md' --ignore node_modules",
+		"test:watch": "jest --watch --coverage"
 	},
 	"devDependencies": {
 		"@babel/preset-env": "7.8.3",
 		"babel-eslint": "10.0.3",
+		"babel-plugin-dynamic-import-node": "2.3.0",
 		"coveralls": "3.0.9",
 		"eslint": "6.8.0",
 		"eslint-config-standard": "14.1.0",
@@ -29,6 +34,7 @@
 		"eslint-plugin-node": "11.0.0",
 		"eslint-plugin-promise": "4.2.1",
 		"eslint-plugin-standard": "4.0.1",
+		"jest": "25.1.0",
 		"markdownlint-cli": "0.21.0",
 		"prettier-eslint": "9.0.1"
 	},

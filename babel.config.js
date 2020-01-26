@@ -14,6 +14,10 @@ module.exports = function (api) {
 
 	api.cache.using(() => process.env.NODE_ENV);
 
+	if (api.env('test')) {
+		plugins.push('babel-plugin-dynamic-import-node');
+	}
+
 	return {
 		presets,
 		plugins
