@@ -5,3 +5,4 @@
 ### New features
 
 * First release of `tracking-manager` 🚀
+* Jest coverage of 100%

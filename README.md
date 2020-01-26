@@ -24,7 +24,7 @@ yarn add --dev tracking-manager
 
 ### Simple trackings configuration
 
-> Trackings configuration must be stores as JSON format.
+> Trackings configuration must be stores as valid JSON format.
 
 The following example store tracking configuration of a click event into the key `header.burgerMenu_onClick`.
 
@@ -37,15 +37,18 @@ The following example store tracking configuration of a click event into the key
             "eventAction": "Click",
             "eventLabel": "Click on burger menu"
         }
+    },
+    "homepage": {
+        "pageView": "Home"
     }
 }
 ```
 
-### Nested trackings configuration keys
+### Nested trackings configuration
 
-Nested levels are unlimited to provide you the best flexibility to sort trackings configurations.
+Nested levels are **unlimited** to provide you the best flexibility to sort trackings configurations.
 
-The following example store tracking configuration of a click event into the key `common.header.burger Menu onClick`.
+The following example store tracking configuration of a click event into the key `common.header.burgerMenu_onClick`.
 
 ```json
 {
@@ -58,6 +61,29 @@ The following example store tracking configuration of a click event into the key
                 "eventLabel": "Click on burger menu"
             }
         }
+    },
+    "homepage": {
+        "pageView": "Home"
+    }
+}
+```
+
+### Dynamic variable in trackings configuration
+
+Dynamic variable must be formatted as `{variableName}` syntax.
+
+```json
+{
+    "header": {
+        "burgerMenu_onClick": {
+            "hitType": "event",
+            "eventCategory": "Header",
+            "eventAction": "Click",
+            "eventLabel": "Click on burger menu {isConnected}"
+        }
+    },
+    "newsInfiniteScroll": {
+        "pageView": "{pageCounter}"
     }
 }
 ```
@@ -66,28 +92,36 @@ The following example store tracking configuration of a click event into the key
 
 ### Initialize the tracking manager
 
-First, import the JSON configuration file and the `trackingManager` script. Next, initialize the tracking manager.
-
-The `init` function parse the DOM to add event listeners on all `data-track` HTML element.
+First, import the JSON configuration file and the `trackingManager` script.
 
 ```javascript
 const configTracking = require('./config-tracking');
 const TrackingManager = require('tracking-manager');
+```
 
+Next, initialize the tracking manager.
+
+```javascript
 const trackingManager = new TrackingManager({
     config: configTracking
 });
+```
 
+Call the `init` function to trigger a DOM parsing and add event listeners on all `data-track` HTML elements.
+
+```javascript
 trackingManager.init()
 ```
 
-### Event tracking
+### Events tracking
 
 Tracking manager can be use from HTML or in Javascript, depending on your needs.
 
+> Following examples uses tracking configuration describes at [the top of the readme file](#Configuration)
+
 #### Track events from HTML
 
-The following example track event for the key `header.burgerMenu_onClick`.
+The following example track click event for the key `header.burgerMenu_onClick`.
 
 ```html
 <button
@@ -99,84 +133,60 @@ The following example track event for the key `header.burgerMenu_onClick`.
 
 #### Track dynamic events from HTML
 
-The following example track event for the key `header.burgerMenu_onClick` with dynamic variable `{isConnected}`.
+The following example track click event for the key `header.burgerMenu_onClick` with dynamic variable `{isConnected}`.
 
-```json
-{
-    "header": {
-        "burgerMenu_onClick": {
-            "hitType": "event",
-            "eventCategory": "Header",
-            "eventAction": "Click",
-            "eventLabel": "Click on burger menu {isConnected}"
-        }
-    }
-}
-```
+Add data attribute `data-track-params` with a JSON as value to replace dynamic variables. Position of JSON variables in tracking configurations doesn't matter, the function will automatically search variables to replace.
 
 ```html
 <button
     data-track
     data-track-key="header.burgerMenu_onClick"
-    data-track-params='{"{isConnected}": "true"}'
+    data-track-params='{"{isConnected}": "true","{pageCounter}": "1"}'
 >
 </button>
 ```
 
 #### Track events from Javascript
 
-The following example track event for the key `header.burgerMenu_onClick`.
+The following example track click event for the key `header.burgerMenu_onClick`.
 
 ```javascript
-const configTracking = require('./config-tracking');
-const TrackingManager = require('tracking-manager');
-
-const trackingManager = new TrackingManager({
-    config: configTracking
-});
-
 trackingManager.trackEvent('header.burgerMenu_onClick');
 ```
 
 #### Track dynamic events from Javascript
 
-The following example track event for the key `header.burgerMenu_onClick` with dynamic variable `{isConnected}`.
+The following example track click event for the key `header.burgerMenu_onClick` with dynamic variable `{isConnected}`.
+
+Add parameter to the function `trackEvent` like the following example to replace dynamic variables.
 
 ```javascript
-const configTracking = require('./config-tracking');
-const TrackingManager = require('tracking-manager');
-
-const trackingManager = new TrackingManager({
-    config: configTracking
-});
-
 trackingManager.trackEvent('header.burgerMenu_onClick', {
     '{isConnected}': true
+    '{pageCounter}': 1
 });
 ```
 
 ### Page view tracking
 
+#### Track page view from HTML
+
+The following example track page view for the key `header.burgerMenu_onClick`.
+
+```html
+<button
+    data-track
+    data-track-page-view
+    data-track-key="homepage"
+>
+</button>
+```
+
 #### Track page view from Javascript
 
 The following example track page view for the key `newsInfiniteScroll` with dynamic variable `{pageCounter}`.
 
-```json
-{
-    "newsInfiniteScroll": {
-        "pageView": "{pageCounter}"
-    }
-}
-```
-
 ```javascript
-const configTracking = require('./config-tracking');
-const TrackingManager = require('tracking-manager');
-
-const trackingManager = new TrackingManager({
-    config: configTracking
-});
-
 trackingManager.trackPageView('newsInfiniteScroll', {
     '{pageCounter}': 2
 });
@@ -184,12 +194,10 @@ trackingManager.trackPageView('newsInfiniteScroll', {
 
 ## Debug mode
 
-Debug option is available on initialize to log all tracking in the devtools.
+Debug option is available on the constructor to log all tracking in the browser devtools.
 
 ```javascript
-const TrackingManager = require('tracking-manager');
-
-const trackingManager = new TrackingManager({
+new TrackingManager({
     debug: true
 });
 ```
@@ -198,7 +206,7 @@ const trackingManager = new TrackingManager({
 
 ### `init`
 
-The `init` function parse the DOM to add event listeners on all `data-track` HTML element.
+Trigger a DOM parsing and add event listeners on all `data-track` HTML elements.
 
 ### `trackEvent` and `trackPageView`
 
@@ -220,6 +228,6 @@ Tells to the function the values of dynamic variables.
 
 ## Licence
 
-trackingManager is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+`trackingManager` is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 
 Created with ♥ by [@yoriiis](http://github.com/yoriiis).
