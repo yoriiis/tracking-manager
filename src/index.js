@@ -199,7 +199,7 @@ module.exports = class Tracking {
 				!ignoreRedirect
 			) {
 				json.hitCallback = () => {
-					window.location = callbackUrl;
+					window.location.assign(callbackUrl);
 				};
 			}
 
