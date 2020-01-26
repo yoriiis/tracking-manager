@@ -358,8 +358,6 @@ describe('TrackingManager function', () => {
 	});
 
 	it('Initialize the sendEvent function with hit callback', () => {
-		window.location.assign = jest.fn();
-
 		const callbackUrl = 'http://www.google.fr';
 
 		jsonEvent.hitCallback = () => {
