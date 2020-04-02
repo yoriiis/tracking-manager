@@ -147,6 +147,8 @@ module.exports = class Tracking {
 	 *
 	 * @param {Object} obj Reference object from tracking datas
 	 * @param {Object} replaceObj Replacement object from HTML
+	 *
+	 * @returns {Object} Object with all replacements
 	 */
 	loopReplace (obj, replaceObj) {
 		let replacedObj = {};
