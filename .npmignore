@@ -2,6 +2,7 @@
 .vscode/
 coverage
 src/__tests__
+src/__mocks__
 .editorconfig
 .eslintignore
 .eslintrc.js
