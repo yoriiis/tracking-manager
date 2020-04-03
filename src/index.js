@@ -1,7 +1,7 @@
 /**
  * @license MIT
  * @name tracking-manager
- * @version 1.0.0
+ * @version 1.0.1
  * @author: Yoriiis aka Joris DANIEL <joris.daniel@gmail.com>
  * @description: Tracking Manager allows to manage all your Google Analytics events directly in HTML or Javascript with a simple and extensible configuration and public functions to track events with dynamic variables
  * {@link https://github.com/yoriiis/tracking-manager}
