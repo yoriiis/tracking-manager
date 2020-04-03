@@ -2,7 +2,7 @@
 
 ## 1.0.1
 
-### New features
+### Updates
 
 * Update Jest tests
 
