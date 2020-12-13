@@ -2,16 +2,14 @@
  * Mock implementation of getConfigEventFromKey function
  *
  * @param {Class} trackingManager Instance of trackingManager
- * @param {Boolean} status Status of the return of the function
+ * @param {String} key Tracking configuration key
+ * @param {Object} configTracking configuration datas
  */
-export function mockGetConfigEventFromKey (trackingManager, key) {
+export function mockGetConfigEventFromKey({ trackingManager, key, configTracking }) {
 	trackingManager.getConfigEventFromKey = jest.fn().mockImplementation(() => {
 		return key
 			.split('.')
-			.reduce(
-				(accumulator, currentValue) => accumulator[currentValue],
-				trackingManager.config
-			);
+			.reduce((accumulator, currentValue) => accumulator[currentValue], configTracking);
 	});
 }
 
@@ -21,20 +19,8 @@ export function mockGetConfigEventFromKey (trackingManager, key) {
  * @param {Class} trackingManager Instance of trackingManager
  * @param {Boolean} jsonEvent Object with all replacements
  */
-export function mockLoopReplace (trackingManager, jsonEvent) {
+export function mockLoopReplace(trackingManager, jsonEvent) {
 	trackingManager.loopReplace = jest.fn().mockImplementation(() => {
 		return jsonEvent;
-	});
-}
-
-/**
- * Mock implementation of isGoogleAnalyticsAvailable function
- *
- * @param {Class} trackingManager Instance of trackingManager
- * @param {Boolean} status Status of the return of the function
- */
-export function mockIsGoogleAnalyticsAvailable (trackingManager, status) {
-	trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockImplementation(() => {
-		return status;
 	});
 }
