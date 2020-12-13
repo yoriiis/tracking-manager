@@ -1,11 +1,7 @@
 'use strict';
 
 import TrackingManager from '../index';
-import {
-	mockGetConfigEventFromKey,
-	mockLoopReplace,
-	mockIsGoogleAnalyticsAvailable
-} from '../__mocks__/mocks';
+import { mockGetConfigEventFromKey, mockLoopReplace } from '../__mocks__/mocks';
 
 let trackingManager;
 const configTracking = {
@@ -31,10 +27,6 @@ const jsonEvent = {
 };
 const jsonPageView = {
 	pageView: 'Home'
-};
-
-const options = {
-	config: configTracking
 };
 
 const getInstance = () =>

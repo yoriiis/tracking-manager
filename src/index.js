@@ -166,9 +166,7 @@ module.exports = class Tracking {
 			replacedObj = obj;
 		} else {
 			const replaceExp = new RegExp(Object.keys(replaceObj).join('|'), 'gi');
-			const replaceMatch = function (matches) {
-				return replaceObj[matches];
-			};
+			const replaceMatch = (matches) => replaceObj[matches];
 
 			for (const key in obj) {
 				replacedObj[key] = obj[key].replace(replaceExp, replaceMatch);
