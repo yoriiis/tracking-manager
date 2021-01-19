@@ -176,13 +176,14 @@ module.exports = class Tracking {
 			targetAttribute,
 			element
 		});
-		const needRedirect = this.needRedirectAfterEvent({
-			element,
-			callbackUrl,
-			targetAttribute
-		});
 
-		if (needRedirect) {
+		if (
+			this.needRedirectAfterEvent({
+				element,
+				callbackUrl,
+				targetAttribute
+			})
+		) {
 			json.hitCallback = () => {
 				window.location.assign(callbackUrl);
 			};

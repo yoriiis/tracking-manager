@@ -104,7 +104,7 @@ const trackingManager = new TrackingManager({
 
 > 💡 The tracking configuration can be outsourced in a separate file and import before the initialize.
 
-If the tracking is set in HTML, you need to call the `parseDom` with the target HTML element. The function will parse the element and add event listeners on all `data-track` HTML elements.
+If the tracking is set in HTML, you need to call the `parseDom` with the target HTML element. The function will parse the element and add event listeners on all `data-track` HTML elements found inside the target element.
 
 ```html
 <div class="component">
@@ -122,6 +122,8 @@ trackingManager.parseDom(document.querySelector('.component'));
 ```
 
 > Parsed element has an attribute `tracking-parsed` to prevent multiple parsing.
+
+> 💡 If the `[data-track]` element is a link with an `href` attribute and the redirect must not be triggered by the tracking manager, add the `data-no-tracking-redirect` attribut on the element.
 
 ### Events tracking
 

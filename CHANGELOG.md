@@ -8,6 +8,14 @@
 - Update th node.js engine to `v12.14.0`
 - Move the tracking configuration on each instance (tracking by components)
 
+### Fixes
+
+- `[data-track]` element are not longer blocked by a `preventDefault` when Google Analytics is not available (with an Ad blocker for example)
+
+### Removes
+
+- `debug` option is removed and the logs are always available. Use another tool to remove them (webpack, etc.)
+
 ## 1.0.1
 
 ### Updates
