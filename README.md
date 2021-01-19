@@ -122,7 +122,7 @@ trackingManager.parseDom(document.querySelector('.component'));
 ```
 
 > Parsed element has an attribute `tracking-parsed` to prevent multiple parsing.
-
+>
 > 💡 If the `[data-track]` element is a link with an `href` attribute and the redirect must not be triggered by the tracking manager, add the `data-no-tracking-redirect` attribut on the element.
 
 ### Events tracking
