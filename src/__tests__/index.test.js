@@ -1,24 +1,19 @@
 'use strict';
 
 import TrackingManager from '../index';
-import {
-	mockGetConfigEventFromKey,
-	mockLoopReplace,
-	mockIsGoogleAnalyticsAvailable
-} from '../__mocks__/mocks';
+import { mockGetConfigEventFromKey, mockLoopReplace } from '../__mocks__/mocks';
 
 let trackingManager;
 const configTracking = {
-	common: {
-		header: {
-			burgerMenu_onClick: {
-				hitType: 'event',
-				eventCategory: 'Header',
-				eventAction: 'Click',
-				eventLabel: 'Click on burger menu - {user} {isConnected}'
-			}
+	header: {
+		burgerMenu_onClick: {
+			hitType: 'event',
+			eventCategory: 'Header',
+			eventAction: 'Click',
+			eventLabel: 'Click on burger menu - {user} {isConnected}'
 		}
 	},
+
 	newsInfiniteScroll: {
 		pageView: '{pageView}'
 	}
@@ -34,43 +29,44 @@ const jsonPageView = {
 	pageView: 'Home'
 };
 
-const options = {
-	config: configTracking
-};
-
-const getInstance = () => new TrackingManager(options);
+const getInstance = () =>
+	new TrackingManager({
+		config: configTracking
+	});
 
 beforeEach(() => {
 	document.body.innerHTML = `
-		<a
-            href="http://www.google.fr"
-            target="_blank"
-            class="track-link"
-            data-track
-            data-track-key="common.header.burgerMenu_onClick"
-            data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
-        ></a>
-        <a
-            href="http://www.google.fr"
-            target="_blank"
-            class="track-link-without-params"
-            data-track
-            data-track-key="common.header.burgerMenu_onClick"
-        ></a>
-		<a
-            href="http://www.google.fr"
-            target="_blank"
-            class="track-page-view-link"
-            data-track-page-view="Home"
-            data-track
-            data-track-key="newsInfiniteScroll"
-        ></a>
-		<button
-            class="track-button"
-            data-track
-            data-track-key="common.header.burgerMenu_onClick"
-            data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
-        ></button>
+		<div class="component">
+			<a
+				href="http://www.google.fr"
+				target="_blank"
+				class="track-link"
+				data-track
+				data-track-key="header.burgerMenu_onClick"
+				data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
+			></a>
+			<a
+				href="http://www.google.fr"
+				target="_blank"
+				class="track-link-without-params"
+				data-track
+				data-track-key="header.burgerMenu_onClick"
+			></a>
+			<a
+				href="http://www.google.fr"
+				target="_blank"
+				class="track-page-view-link"
+				data-track-page-view="Home"
+				data-track
+				data-track-key="newsInfiniteScroll"
+			></a>
+			<button
+				class="track-button"
+				data-track
+				data-track-key="header.burgerMenu_onClick"
+				data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
+			></button>
+		</div>
 	`;
 
 	Object.defineProperty(window, 'ga', {
@@ -86,46 +82,59 @@ beforeEach(() => {
 		}
 	});
 
+	Object.defineProperty(window, 'dataLayer', {
+		writable: true,
+		value: {
+			push: jest.fn()
+		}
+	});
+
 	trackingManager = getInstance();
 });
 
 describe('TrackingManager constructor', () => {
 	it('Should initialize the constructor', () => {
-		expect(trackingManager.config).toMatchObject(configTracking);
-		expect(trackingManager.debug).toBe(false);
 		expect(trackingManager.selector).toBe('[data-track]');
+		expect(trackingManager.config).toMatchObject(configTracking);
 		expect(trackingManager.ignoreRedirectAttribute).toBe('data-no-tracking-redirect');
 	});
-
-	it('Should initialize the constructor with debug mode', () => {
-		const instance = new TrackingManager({
-			debug: true
-		});
-
-		expect(instance.debug).toBe(true);
-	});
 });
 
-describe('TrackingManager init', () => {
-	it('Should call the init function', () => {
-		trackingManager.parseDOM = jest.fn();
+describe('Tracking parseDom', () => {
+	it('Initialize the parseDom function with GA and a DOM element', () => {
+		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(true);
 
-		trackingManager.init();
-
-		expect(trackingManager.parseDOM).toHaveBeenCalled();
-	});
-});
-
-describe('TrackingManager parseDOM', () => {
-	it('Initialize the parseDOM function', () => {
 		const element = document.querySelector('.track-button');
-
 		element.addEventListener = jest.fn();
 
-		trackingManager.parseDOM();
+		trackingManager.parseDom(document.querySelector('.component'));
 
+		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
 		expect(element.hasAttribute('tracking-parsed')).toBe(true);
-		expect(element.addEventListener).toHaveBeenCalled();
+		expect(element.addEventListener).toHaveBeenCalledWith(
+			'click',
+			trackingManager.trackClickEvent
+		);
+	});
+
+	it('Initialize the parseDom function with the tracking unavailable', () => {
+		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(false);
+
+		const element = document.querySelector('.track-button');
+		element.addEventListener = jest.fn();
+
+		trackingManager.parseDom(document.querySelector('.component'));
+
+		expect(element.hasAttribute('tracking-parsed')).toBe(false);
+		expect(element.addEventListener).not.toHaveBeenCalled();
+	});
+
+	it('Initialize the parseDom function without the dom element', () => {
+		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(true);
+
+		trackingManager.parseDom();
+
+		expect(trackingManager.isGoogleAnalyticsAvailable).not.toHaveBeenCalled();
 	});
 });
 
@@ -133,7 +142,7 @@ describe('TrackingManager trackPageView', () => {
 	it('Should call the trackPageView function', () => {
 		const key = 'newsInfiniteScroll';
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		trackingManager.sendPageView = jest.fn();
 
 		trackingManager.trackPageView(key, 'Home');
@@ -148,7 +157,7 @@ describe('TrackingManager trackPageView', () => {
 	it('Should call the trackPageView function with unknown key', () => {
 		const key = 'test';
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 
 		expect(() => {
 			trackingManager.trackPageView(key, 'home');
@@ -158,9 +167,9 @@ describe('TrackingManager trackPageView', () => {
 
 describe('TrackingManager trackEvent', () => {
 	it('Should call the trackEvent function', () => {
-		const key = 'common.header.burgerMenu_onClick';
+		const key = 'header.burgerMenu_onClick';
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		trackingManager.sendEvent = jest.fn();
 
 		trackingManager.trackEvent(key, {
@@ -171,16 +180,14 @@ describe('TrackingManager trackEvent', () => {
 		expect(trackingManager.getConfigEventFromKey).toHaveBeenCalledWith(key);
 		expect(trackingManager.sendEvent).toHaveBeenCalledWith({
 			key,
-			json: jsonEvent,
-			callbackUrl: false,
-			target: false
+			json: jsonEvent
 		});
 	});
 
 	it('Should call the trackEvent function with unknown key', () => {
 		const key = 'test';
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 
 		expect(() => {
 			trackingManager.trackEvent(key, 'home');
@@ -190,10 +197,10 @@ describe('TrackingManager trackEvent', () => {
 
 describe('TrackingManager trackClickEvent', () => {
 	it('Should call the trackClickEvent function with a button', () => {
-		const key = 'common.header.burgerMenu_onClick';
+		const key = 'header.burgerMenu_onClick';
 		const element = document.querySelector('.track-button');
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		mockLoopReplace(trackingManager, jsonEvent);
 		trackingManager.sendEvent = jest.fn();
 
@@ -208,16 +215,16 @@ describe('TrackingManager trackClickEvent', () => {
 			key,
 			json: jsonEvent,
 			callbackUrl: false,
-			target: false,
+			targetAttribute: false,
 			element
 		});
 	});
 
 	it('Should call the trackClickEvent function with a link', () => {
-		const key = 'common.header.burgerMenu_onClick';
+		const key = 'header.burgerMenu_onClick';
 		const element = document.querySelector('.track-link');
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		mockLoopReplace(trackingManager, jsonEvent);
 		trackingManager.sendEvent = jest.fn();
 
@@ -231,16 +238,16 @@ describe('TrackingManager trackClickEvent', () => {
 			key,
 			json: jsonEvent,
 			callbackUrl: 'http://www.google.fr',
-			target: '_blank',
+			targetAttribute: '_blank',
 			element
 		});
 	});
 
 	it('Should call the trackClickEvent function with a link with parameters', () => {
-		const key = 'common.header.burgerMenu_onClick';
+		const key = 'header.burgerMenu_onClick';
 		const element = document.querySelector('.track-link-without-params');
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		mockLoopReplace(trackingManager, jsonEvent);
 		trackingManager.sendEvent = jest.fn();
 
@@ -251,9 +258,9 @@ describe('TrackingManager trackClickEvent', () => {
 
 		expect(trackingManager.sendEvent).toHaveBeenCalledWith({
 			key,
-			json: configTracking.common.header.burgerMenu_onClick,
+			json: configTracking.header.burgerMenu_onClick,
 			callbackUrl: 'http://www.google.fr',
-			target: '_blank',
+			targetAttribute: '_blank',
 			element
 		});
 	});
@@ -262,7 +269,7 @@ describe('TrackingManager trackClickEvent', () => {
 		const key = 'newsInfiniteScroll';
 		const element = document.querySelector('.track-page-view-link');
 
-		mockGetConfigEventFromKey(trackingManager, key);
+		mockGetConfigEventFromKey({ trackingManager, key, configTracking });
 		mockLoopReplace(trackingManager, jsonEvent);
 		trackingManager.sendPageView = jest.fn();
 
@@ -280,7 +287,7 @@ describe('TrackingManager trackClickEvent', () => {
 
 describe('TrackingManager loopReplace', () => {
 	it('Should call the loopReplace function', () => {
-		const objectReference = configTracking.common.header.burgerMenu_onClick;
+		const objectReference = configTracking.header.burgerMenu_onClick;
 		const objectReplace = document
 			.querySelector('.track-button')
 			.getAttribute('data-track-params');
@@ -290,7 +297,7 @@ describe('TrackingManager loopReplace', () => {
 	});
 
 	it('Should call the loopReplace function without replace object', () => {
-		const objectReference = configTracking.common.header.burgerMenu_onClick;
+		const objectReference = configTracking.header.burgerMenu_onClick;
 		const result = trackingManager.loopReplace(objectReference);
 
 		expect(result).toMatchObject(objectReference);
@@ -298,21 +305,23 @@ describe('TrackingManager loopReplace', () => {
 });
 
 describe('TrackingManager sendEvent', () => {
-	it('Initialize the sendEvent function with debug', () => {
-		const key = 'common.header.burgerMenu_onClick';
+	it('Initialize the sendEvent function', () => {
+		const key = 'header.burgerMenu_onClick';
 		const callbackUrl = 'http://www.google.fr';
+		const element = document.querySelector('.track-link');
+		const targetAttribute = '_blank';
 
-		window.ga = jest.fn();
 		console.log = jest.fn();
-		mockIsGoogleAnalyticsAvailable(trackingManager, true);
+		trackingManager.needRedirectAfterEvent = jest.fn().mockReturnValue(false);
+		window.location.assign = jest.fn();
+		window.ga = jest.fn();
 
-		trackingManager.debug = true;
 		trackingManager.sendEvent({
 			key,
 			json: jsonEvent,
-			callbackUrl: callbackUrl,
-			target: '_blank',
-			element: document.querySelector('.track-link')
+			callbackUrl,
+			targetAttribute,
+			element
 		});
 
 		expect(console.log).toBeCalledWith(
@@ -321,12 +330,17 @@ describe('TrackingManager sendEvent', () => {
 			key,
 			jsonEvent,
 			{
-				callbackUrl: callbackUrl,
-				target: '_blank',
-				element: document.querySelector('.track-link')
+				callbackUrl,
+				targetAttribute,
+				element
 			}
 		);
-		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
+		expect(trackingManager.needRedirectAfterEvent).toHaveBeenCalledWith({
+			element,
+			callbackUrl,
+			targetAttribute
+		});
+		expect(window.location.assign).not.toHaveBeenCalledWith();
 		expect(window.ga).toHaveBeenCalledWith('send', jsonEvent);
 	});
 
@@ -336,21 +350,44 @@ describe('TrackingManager sendEvent', () => {
 			window.location.assign(callbackUrl);
 		};
 
-		window.ga = jest.fn();
-		window.location.assign = jest.fn();
 		console.log = jest.fn();
-		mockIsGoogleAnalyticsAvailable(trackingManager, true);
+		trackingManager.needRedirectAfterEvent = jest.fn().mockReturnValue(true);
+		window.location.assign = jest.fn();
+		window.ga = jest.fn();
 
 		trackingManager.sendEvent({
-			key: 'common.header.burgerMenu_onClick',
+			key: 'header.burgerMenu_onClick',
 			json: jsonEvent,
-			callbackUrl: false,
-			target: false,
+			callbackUrl,
+			targetAttribute: false,
 			element: document.querySelector('.track-link')
 		});
 		jsonEvent.hitCallback();
 
 		expect(window.location.assign).toHaveBeenCalledWith(callbackUrl);
+	});
+
+	it('Initialize the sendEvent function with default parameters', () => {
+		const callbackUrl = 'http://localhost/';
+		jsonEvent.hitCallback = () => {
+			window.location.assign(callbackUrl);
+		};
+
+		console.log = jest.fn();
+		trackingManager.needRedirectAfterEvent = jest.fn().mockReturnValue(false);
+		window.location.assign = jest.fn();
+		window.ga = jest.fn();
+
+		trackingManager.sendEvent({
+			key: 'header.burgerMenu_onClick'
+		});
+
+		expect(trackingManager.needRedirectAfterEvent).toHaveBeenCalledWith({
+			callbackUrl: false,
+			targetAttribute: false,
+			element: false
+		});
+		expect(window.ga).toHaveBeenCalledWith('send', {});
 	});
 });
 
@@ -358,48 +395,32 @@ describe('TrackingManager sendPageView', () => {
 	it('Should call the sendPageView function', () => {
 		window.ga = jest.fn();
 		console.log = jest.fn();
-		mockIsGoogleAnalyticsAvailable(trackingManager, true);
 
 		trackingManager.sendPageView({
-			key: 'common.header.burgerMenu_onClick',
-			json: jsonPageView
-		});
-
-		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
-		expect(window.ga).toHaveBeenCalledWith('set', 'page', 'Home');
-		expect(window.ga).toHaveBeenCalledWith('send', 'pageView');
-	});
-
-	it('Should call the sendPageView function with debug', () => {
-		window.ga = jest.fn();
-		console.log = jest.fn();
-		mockIsGoogleAnalyticsAvailable(trackingManager, true);
-
-		trackingManager.debug = true;
-		trackingManager.sendPageView({
-			key: 'common.header.burgerMenu_onClick',
+			key: 'header.burgerMenu_onClick',
 			json: jsonPageView
 		});
 
 		expect(console.log).toBeCalledWith(
 			'%c[Tracking -> trackPageView]:',
 			'color: DeepPink;',
-			'common.header.burgerMenu_onClick',
+			'header.burgerMenu_onClick',
 			jsonPageView
 		);
+		expect(window.ga).toHaveBeenCalledWith('set', 'page', 'Home');
+		expect(window.ga).toHaveBeenCalledWith('send', 'pageView');
 	});
 
-	it('Should call the sendPageView function with GA not available', () => {
+	it('Should call the sendPageView function without json', () => {
 		window.ga = jest.fn();
-		mockIsGoogleAnalyticsAvailable(trackingManager, false);
+		console.log = jest.fn();
 
 		trackingManager.sendPageView({
-			key: 'common.header.burgerMenu_onClick',
-			json: jsonPageView
+			key: 'header.burgerMenu_onClick',
+			json: {}
 		});
 
-		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
-		expect(window.ga).not.toHaveBeenCalledWith('set', 'page', 'Home');
+		expect(window.ga).not.toHaveBeenCalled();
 	});
 });
 
@@ -417,8 +438,71 @@ describe('TrackingManager isGoogleAnalyticsAvailable', () => {
 
 describe('TrackingManager getConfigEventFromKey', () => {
 	it('Should call the getConfigEventFromKey function', () => {
-		const result = trackingManager.getConfigEventFromKey('common.header.burgerMenu_onClick');
+		const result = trackingManager.getConfigEventFromKey('header.burgerMenu_onClick');
 
-		expect(result).toBe(configTracking.common.header.burgerMenu_onClick);
+		expect(result).toBe(configTracking.header.burgerMenu_onClick);
+	});
+});
+
+describe('TrackingManager needRedirectAfterEvent', () => {
+	it('Should call the needRedirectAfterEvent function all valid conditions', () => {
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: 'http://localhost',
+			targetAttribute: false,
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(true);
+	});
+
+	it('Should call the needRedirectAfterEvent function without callback url', () => {
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: false,
+			targetAttribute: false,
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(false);
+	});
+
+	it('Should call the needRedirectAfterEvent function with an empty callback url', () => {
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: '',
+			targetAttribute: false,
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(false);
+	});
+
+	it('Should call the needRedirectAfterEvent function with a callback url equal to #', () => {
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: '#',
+			targetAttribute: false,
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(false);
+	});
+
+	it('Should call the needRedirectAfterEvent function with a target attribute', () => {
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: 'http://localhost',
+			targetAttribute: '_blank',
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(false);
+	});
+
+	it('Should call the needRedirectAfterEvent function with an ignore attribute', () => {
+		document.querySelector('.track-link').setAttribute('data-no-tracking-redirect', '');
+		const result = trackingManager.needRedirectAfterEvent({
+			callbackUrl: 'http://localhost',
+			targetAttribute: false,
+			element: document.querySelector('.track-link')
+		});
+
+		expect(result).toBe(false);
 	});
 });
