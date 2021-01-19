@@ -17,7 +17,7 @@
 	"main": "src/index.js",
 	"scripts": {
 		"coverage": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
-		"test": "jest",
+		"test": "jest --verbose --coverage",
 		"test:coverage": "jest --coverage",
 		"test:eslint": "eslint -c ./.eslintrc.js .",
 		"test:markdown": "markdownlint '**/*.md' --ignore node_modules",
