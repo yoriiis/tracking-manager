@@ -18,7 +18,7 @@ yarn add tracking-manager
 
 ## Environment
 
-`trackingManager` was built for Node.js `>=12.14.0`.
+`trackingManager` was built for Node.js `>=8.11.2`.
 
 ## Configuration
 
@@ -122,10 +122,6 @@ trackingManager.parseDom(document.querySelector('.component'));
 ```
 
 > Parsed element has an attribute `tracking-parsed` to prevent multiple parsing.
-
-### Tracking type
-
-The `TrackingManager` can trigger tracking events by Google Analytics (`ga.send`) or Google Tag Manager (`window.dataLayer.push()`). Update the `type` parameter by `ga|gtm` on the initialize according to your needs, the default is set to `ga` (Google Analytics).
 
 ### Events tracking
 

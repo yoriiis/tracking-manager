@@ -13,12 +13,10 @@ module.exports = class Tracking {
 	 *
 	 * @param {Object} options Options parameters
 	 * @param {Object} options.config Tracking config
-	 * @param {Object} options.type Tracking type (GA|GTM)
 	 */
-	constructor({ config, type = 'ga' }) {
+	constructor({ config }) {
 		this.selector = '[data-track]';
 		this.config = config;
-		this.type = type;
 		this.ignoreRedirectAttribute = 'data-no-tracking-redirect';
 		this.trackClickEvent = this.trackClickEvent.bind(this);
 	}
@@ -29,7 +27,7 @@ module.exports = class Tracking {
 	 * @param {HTMLElement} domElement Target element to search "data-track" attributes
 	 */
 	parseDom(domElement) {
-		if (this.isTrackingAvailable(domElement)) {
+		if (domElement && this.isGoogleAnalyticsAvailable(domElement)) {
 			const elementsToTrack = [
 				...domElement.querySelectorAll(`${this.selector}:not([tracking-parsed])`)
 			];
@@ -38,20 +36,6 @@ module.exports = class Tracking {
 				element.addEventListener('click', this.trackClickEvent);
 			});
 		}
-	}
-
-	/**
-	 * Check if the tracking can be send
-	 *
-	 * @param {HTMLElement} domElement Target element to search "data-track" attributes
-	 *
-	 * @returns {Boolean} Tracking status
-	 */
-	isTrackingAvailable(domElement) {
-		return (
-			domElement &&
-			((this.type === 'ga' && this.isGoogleAnalyticsAvailable()) || this.type === 'gtm')
-		);
 	}
 
 	/**
@@ -197,19 +181,13 @@ module.exports = class Tracking {
 			callbackUrl,
 			targetAttribute
 		});
-		if (this.type === 'gtm') {
-			window.dataLayer.push(json);
-			if (needRedirect) {
+
+		if (needRedirect) {
+			json.hitCallback = () => {
 				window.location.assign(callbackUrl);
-			}
-		} else {
-			if (needRedirect) {
-				json.hitCallback = () => {
-					window.location.assign(callbackUrl);
-				};
-			}
-			window.ga('send', json);
+			};
 		}
+		window.ga('send', json);
 	}
 
 	/**
@@ -223,18 +201,8 @@ module.exports = class Tracking {
 		console.log('%c[Tracking -> trackPageView]:', 'color: DeepPink;', key, json);
 
 		if (json.pageView) {
-			if (this.type === 'gtm') {
-				window.dataLayer.push({
-					event: 'pageview',
-					page: {
-						path: json.pageView,
-						title: document.title
-					}
-				});
-			} else {
-				window.ga('set', 'page', json.pageView);
-				window.ga('send', 'pageView');
-			}
+			window.ga('set', 'page', json.pageView);
+			window.ga('send', 'pageView');
 		}
 	}
 

@@ -2,10 +2,6 @@
 
 ## 2.0.0
 
-### New features
-
-- Add the Google Analytics and Google Tag Manager compatibility (`type` parameter)
-
 ### Updates
 
 - Move CI to GitHub Actions

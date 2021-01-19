@@ -96,21 +96,20 @@ describe('TrackingManager constructor', () => {
 	it('Should initialize the constructor', () => {
 		expect(trackingManager.selector).toBe('[data-track]');
 		expect(trackingManager.config).toMatchObject(configTracking);
-		expect(trackingManager.type).toBe('ga');
 		expect(trackingManager.ignoreRedirectAttribute).toBe('data-no-tracking-redirect');
 	});
 });
 
 describe('Tracking parseDom', () => {
 	it('Initialize the parseDom function with GA and a DOM element', () => {
-		trackingManager.isTrackingAvailable = jest.fn().mockReturnValue(true);
+		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(true);
 
 		const element = document.querySelector('.track-button');
 		element.addEventListener = jest.fn();
 
 		trackingManager.parseDom(document.querySelector('.component'));
 
-		expect(trackingManager.isTrackingAvailable).toHaveBeenCalled();
+		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
 		expect(element.hasAttribute('tracking-parsed')).toBe(true);
 		expect(element.addEventListener).toHaveBeenCalledWith(
 			'click',
@@ -119,7 +118,7 @@ describe('Tracking parseDom', () => {
 	});
 
 	it('Initialize the parseDom function with the tracking unavailable', () => {
-		trackingManager.isTrackingAvailable = jest.fn().mockReturnValue(false);
+		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(false);
 
 		const element = document.querySelector('.track-button');
 		element.addEventListener = jest.fn();
@@ -129,36 +128,13 @@ describe('Tracking parseDom', () => {
 		expect(element.hasAttribute('tracking-parsed')).toBe(false);
 		expect(element.addEventListener).not.toHaveBeenCalled();
 	});
-});
 
-describe('Tracking isTrackingAvailable', () => {
-	it('Initialize the isTrackingAvailable function', () => {
+	it('Initialize the parseDom function without the dom element', () => {
 		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(true);
 
-		const element = document.querySelector('.track-button');
-		const result = trackingManager.isTrackingAvailable(element);
+		trackingManager.parseDom();
 
-		expect(result).toBe(true);
-		expect(trackingManager.isGoogleAnalyticsAvailable).toHaveBeenCalled();
-	});
-
-	it('Initialize the isTrackingAvailable function with GA unavailable', () => {
-		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(false);
-
-		const element = document.querySelector('.track-button');
-		const result = trackingManager.isTrackingAvailable(element);
-
-		expect(result).toBe(false);
-	});
-
-	it('Initialize the isTrackingAvailable function with the type GTM', () => {
-		trackingManager.isGoogleAnalyticsAvailable = jest.fn().mockReturnValue(false);
-
-		trackingManager.type = 'gtm';
-		const element = document.querySelector('.track-button');
-		const result = trackingManager.isTrackingAvailable(element);
-
-		expect(result).toBe(true);
+		expect(trackingManager.isGoogleAnalyticsAvailable).not.toHaveBeenCalled();
 	});
 });
 
@@ -413,54 +389,6 @@ describe('TrackingManager sendEvent', () => {
 		});
 		expect(window.ga).toHaveBeenCalledWith('send', {});
 	});
-
-	it('Initialize the sendEvent function with the type GTM and a redirect', () => {
-		const callbackUrl = 'http://localhost/';
-		jsonEvent.hitCallback = () => {
-			window.location.assign(callbackUrl);
-		};
-
-		console.log = jest.fn();
-		window.dataLayer.push = jest.fn();
-		trackingManager.needRedirectAfterEvent = jest.fn().mockReturnValue(true);
-		window.location.assign = jest.fn();
-		window.ga = jest.fn();
-
-		trackingManager.type = 'gtm';
-		trackingManager.sendEvent({
-			key: 'header.burgerMenu_onClick',
-			callbackUrl,
-			element: document.querySelector('.track-link'),
-			json: jsonEvent
-		});
-
-		expect(window.dataLayer.push).toHaveBeenCalled();
-		expect(trackingManager.needRedirectAfterEvent).toHaveBeenCalled();
-		expect(window.location.assign).toHaveBeenCalledWith(callbackUrl);
-	});
-
-	it('Initialize the sendEvent function with the type GTM and no redirect', () => {
-		const callbackUrl = 'http://localhost/';
-		jsonEvent.hitCallback = () => {
-			window.location.assign(callbackUrl);
-		};
-
-		console.log = jest.fn();
-		window.dataLayer.push = jest.fn();
-		trackingManager.needRedirectAfterEvent = jest.fn().mockReturnValue(false);
-		window.location.assign = jest.fn();
-		window.ga = jest.fn();
-
-		trackingManager.type = 'gtm';
-		trackingManager.sendEvent({
-			key: 'header.burgerMenu_onClick',
-			json: jsonEvent
-		});
-
-		expect(window.dataLayer.push).toHaveBeenCalledWith(jsonEvent);
-		expect(trackingManager.needRedirectAfterEvent).toHaveBeenCalled();
-		expect(window.location.assign).not.toHaveBeenCalled();
-	});
 });
 
 describe('TrackingManager sendPageView', () => {
@@ -481,27 +409,6 @@ describe('TrackingManager sendPageView', () => {
 		);
 		expect(window.ga).toHaveBeenCalledWith('set', 'page', 'Home');
 		expect(window.ga).toHaveBeenCalledWith('send', 'pageView');
-	});
-
-	it('Should call the sendPageView function with the type GTM', () => {
-		window.dataLayer.push = jest.fn();
-		window.ga = jest.fn();
-		console.log = jest.fn();
-
-		trackingManager.type = 'gtm';
-		trackingManager.sendPageView({
-			key: 'header.burgerMenu_onClick',
-			json: jsonPageView
-		});
-
-		expect(window.dataLayer.push).toHaveBeenCalledWith({
-			event: 'pageview',
-			page: {
-				path: jsonPageView.pageView,
-				title: document.title
-			}
-		});
-		expect(window.ga).not.toHaveBeenCalled();
 	});
 
 	it('Should call the sendPageView function without json', () => {
