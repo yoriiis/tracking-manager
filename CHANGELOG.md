@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.1
+
+### Fixes
+
+- Fix `loopReplace` when event object contains boolean
+
 ## 2.0.0
 
 ### Updates
