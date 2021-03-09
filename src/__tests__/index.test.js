@@ -8,9 +8,10 @@ const configTracking = {
 	header: {
 		burgerMenu_onClick: {
 			hitType: 'event',
-			eventCategory: 'Header',
-			eventAction: 'Click',
-			eventLabel: 'Click on burger menu - {user} {isConnected}'
+			eventCategory: 'header',
+			eventAction: 'display',
+			eventLabel: 'burger menu - {user} {isConnected}',
+			nonInteraction: true
 		}
 	},
 
@@ -21,9 +22,10 @@ const configTracking = {
 
 const jsonEvent = {
 	hitType: 'event',
-	eventCategory: 'Header',
-	eventAction: 'Click',
-	eventLabel: 'Click on burger menu - Jest true'
+	eventCategory: 'header',
+	eventAction: 'display',
+	eventLabel: 'burger menu - Jest true',
+	nonInteraction: true
 };
 const jsonPageView = {
 	pageView: 'Home'
