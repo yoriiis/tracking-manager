@@ -1,6 +1,7 @@
 module.exports = {
-	parser: 'babel-eslint',
+	parser: '@babel/eslint-parser',
 	parserOptions: {
+		requireConfigFile: false,
 		ecmaVersion: 6,
 		ecmaFeatures: {
 			impliedStrict: true,
@@ -16,21 +17,20 @@ module.exports = {
 		jest: true
 	},
 
-	extends: 'standard',
+	extends: ['standard', 'plugin:prettier/recommended'],
 
 	rules: {
-		indent: ['error', 'tab', { ignoredNodes: ['TemplateLiteral > *'] }],
+		indent: ['error', 'tab', { ignoredNodes: ['TemplateLiteral *'], SwitchCase: 1 }],
 		'no-tabs': 0,
-		'no-console': 0,
-		semi: [1, 'always'],
 		'space-before-function-paren': [
 			'error',
-			{ anonymous: 'never', named: 'never', asyncArrow: 'always' }
-		]
+			{ anonymous: 'always', named: 'never', asyncArrow: 'always' }
+		],
+		'linebreak-style': ['error', 'unix']
 	},
 
 	globals: {
 		document: false,
 		window: false
 	}
-};
+}
