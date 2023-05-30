@@ -1,30 +1,44 @@
 # trackingManager
 
-![trackingManager](https://img.shields.io/badge/tracking--manager-v2.0.1-546e7a.svg?style=for-the-badge) [![TravisCI](https://img.shields.io/travis/com/yoriiis/tracking-manager/master?style=for-the-badge)](https://travis-ci.com/yoriiis/tracking-manager) [![Coverage Status](https://img.shields.io/coveralls/github/yoriiis/tracking-manager?style=for-the-badge)](https://coveralls.io/github/yoriiis/tracking-manager?branch=master) ![Node.js](https://img.shields.io/node/v/tracking-manager?style=for-the-badge) [![Bundlephobia](https://img.shields.io/bundlephobia/minzip/tracking-manager?style=for-the-badge)](https://bundlephobia.com/result?p=tracking-manager@latest)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/yoriiis/dtracking-manager/build.yml?branch=main&style=for-the-badge)](https://github.com/yoriiis/dtracking-manager/actions/workflows/build.yml) [![Coverage Status](https://img.shields.io/coveralls/github/yoriiis/dtracking-manager?style=for-the-badge)](https://coveralls.io/github/yoriiis/dtracking-manager?branch=main)
 
-The `trackingManager` allows to manage all your Google Analytics events directly in HTML or Javascript with a simple and extensible configuration and public functions to track events with dynamic variables. The concept is compatible with a site with a large number of events to manage.
+The `tracking-manager` allows to manage all your Google Analytics events directly in HTML or Javascript with a simple and extensible configuration and public functions to track events with dynamic variables. The concept is compatible with a site with a large number of events to manage.
 
 ## Installation
 
-The plugin is available as the `tracking-manager` package name on [npm](https://www.npmjs.com/package/tracking-manager) and [Github](https://github.com/yoriiis/tracking-manager).
+### NPM
+
+NPM is the recommended installation method. Install `tracking-manager` in your project with the following command:
 
 ```bash
-npm install tracking-manager --save
+npm install tracking-manager --save-dev
 ```
 
 ```bash
-yarn add tracking-manager
+yarn add tracking-manager --dev
 ```
 
-## Environment
+> **Warning** validate-target@3 is ESM.
+>
+> **Note** Minimum supported `Node.js` version is `16.20.0`.
 
-`trackingManager` was built for Node.js `>=8.11.2`.
+### CDN
+
+You can also download it and include it with a script tag. The library will be registered as the global variable `window.LazyObserver`.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/tracking-manager@3" crossorigin></script>
+```
+
+> **Note** You can browse the source of the NPM package at [jsdelivr.com/package/npm/tracking-manager](https://www.jsdelivr.com/package/npm/tracking-manager).
+
+## How it works
 
 ## Configuration
 
 ### Simple trackings configuration
 
-> Trackings configuration must be stores as valid JSON format.
+> **Note** Trackings configuration must be stores as valid JSON format.
 
 The following example store tracking configuration of a click event into the key `burgerMenu_onClick`.
 
@@ -62,7 +76,7 @@ The following example store tracking configuration of a click event into the key
 
 To use dynamic variables, wrapped the variable name with a placeholder of your choice. In the following example, the variable `{isConnected}` will be transformed.
 
-> It is better to choose a placeholder to wrap variable name to avoid conflict with a real word.
+> **Note** It is better to choose a placeholder to wrap variable name to avoid conflict with a real word.
 
 ```json
 {
@@ -79,17 +93,17 @@ To use dynamic variables, wrapped the variable name with a placeholder of your c
 
 ### Initialize the tracking manager
 
-The `TrackingManager` is designed to work by component, each components has their own configuration.
+The `tracking-manager` is designed to work by component, each components has their own configuration.
 
 First, import the `tracking-manager` package.
 
-```javascript
+```js
 import TrackingManager from 'tracking-manager';
 ```
 
 Next, initialize the tracking manager with the tracking configuration.
 
-```javascript
+```js
 const trackingManager = new TrackingManager({
   config: {
     burgerMenu_onClick: {
@@ -102,7 +116,7 @@ const trackingManager = new TrackingManager({
 });
 ```
 
-> 💡 The tracking configuration can be outsourced in a separate file and import before the initialize.
+> **Note** The tracking configuration can be outsourced in a separate file and import before the initialize.
 
 If the tracking is set in HTML, you need to call the `parseDom` with the target HTML element. The function will parse the element and add event listeners on all `data-track` HTML elements found inside the target element.
 
@@ -117,17 +131,17 @@ If the tracking is set in HTML, you need to call the `parseDom` with the target 
 </div>
 ```
 
-```javascript
+```js
 trackingManager.parseDom(document.querySelector('.component'));
 ```
 
-> Parsed element has an attribute `tracking-parsed` to prevent multiple parsing.
+> **Note** Parsed element has an attribute `tracking-parsed` to prevent multiple parsing.
 >
-> 💡 If the `[data-track]` element is a link with an `href` attribute and the redirect must not be triggered by the tracking manager, add the `data-no-tracking-redirect` attribut on the element.
+> If the `[data-track]` element is a link with an `href` attribute and the redirect must not be triggered by the tracking manager, add the `data-no-tracking-redirect` attribut on the element.
 
 ### Events tracking
 
-The `TrackingManager` can be used from HTML or in Javascript, depending on your needs.
+The `tracking-manager` can be used from HTML or in Javascript, depending on your needs.
 
 Following examples will uses the tracking configuration describes below.
 
@@ -174,7 +188,7 @@ Add the data attribute `data-track-params` with a JSON as value to replace dynam
 
 The following example track click event for the key `burgerMenu_onClick`.
 
-```javascript
+```js
 trackingManager.trackEvent('burgerMenu_onClick');
 ```
 
@@ -184,7 +198,7 @@ The following example track click event for the key `burgerMenu_onClick` with dy
 
 Add parameter to the function `trackEvent` like the following example to replace dynamic variables.
 
-```javascript
+```js
 trackingManager.trackEvent('burgerMenu_onClick', {
   '{isConnected}': true
 });
@@ -204,13 +218,13 @@ The following example track page view for the key `burgerMenu_onClick`.
 
 The following example track page view for the key `infiniteScroll` with the dynamic variable `{pageCounter}`.
 
-```javascript
+```js
 trackingManager.trackPageView('infiniteScroll', {
   '{pageCounter}': 2
 });
 ```
 
-## Available methods
+## Methods
 
 ### `parseDom`
 
@@ -236,6 +250,6 @@ Tells to the function the values of the dynamic variables.
 
 ## Licence
 
-`trackingManager` is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+`tracking-manager` is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 
 Created with ♥ by [@yoriiis](http://github.com/yoriiis).
