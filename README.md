@@ -53,25 +53,6 @@ The following example store tracking configuration of a click event into the key
 }
 ```
 
-### Nested trackings configuration
-
-Nested levels are **unlimited** to provide you the best flexibility to sort trackings configurations.
-
-The following example store tracking configuration of a click event into the key `header.burgerMenu_onClick`.
-
-```json
-{
-  "header": {
-    "burgerMenu_onClick": {
-      "hitType": "event",
-      "eventCategory": "Header",
-      "eventAction": "Click",
-      "eventLabel": "Click on burger menu"
-    }
-  }
-}
-```
-
 ### Dynamic variable in trackings configuration
 
 To use dynamic variables, wrapped the variable name with a placeholder of your choice. In the following example, the variable `{isConnected}` will be transformed.
