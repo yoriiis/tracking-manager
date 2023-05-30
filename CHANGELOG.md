@@ -8,6 +8,10 @@
 
 - Minimum supported `Node.js` version is `16.20.0` and package is ESM ([#8](https://github.com/yoriiis/tracking-manager/pull/8))
 
+### Updates
+
+- Transform to TypeScript ([#14](https://github.com/yoriiis/tracking-manager/pull/14))
+
 ## 2.0.1
 
 ### Fixes
