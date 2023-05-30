@@ -26,6 +26,7 @@
 		"test": "npm run test:markdown && npm run test:eslint && npm run test:unit && npm run test:types",
 		"test:eslint": "eslint ./src ./config --config ./config/.eslintrc.cjs --ignore-pattern lib --ignore-pattern types",
 		"test:markdown": "markdownlint-cli2 '**/*.md' '.github/*.md'",
+		"test:types": "tsc --noEmit",
 		"test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config config/jest.config.js --verbose --coverage",
 		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config config/jest.config.js --watchAll --coverage"
 	},
