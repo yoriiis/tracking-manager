@@ -1,12 +1,23 @@
+declare global {
+	interface Window {
+		ga: (command: any, hitType: any, parameters?: any) => void
+	}
+}
+
 export default class Tracking {
+	selector: string
+	config: any
+	ignoreRedirectAttribute: string
+
 	/**
 	 * @param {Object} options Options parameters
 	 * @param {Object} options.config Tracking config
 	 */
-	constructor({ config }) {
+	constructor({ config }: { config: any }) {
 		this.selector = '[data-track]'
 		this.config = config
 		this.ignoreRedirectAttribute = 'data-no-tracking-redirect'
+
 		this.trackClickEvent = this.trackClickEvent.bind(this)
 	}
 
@@ -14,8 +25,8 @@ export default class Tracking {
 	 * Parse the DOM to search all tracking attributes
 	 * @param {HTMLElement} domElement Target element to search "data-track" attributes
 	 */
-	parseDom(domElement) {
-		if (domElement && this.isGoogleAnalyticsAvailable(domElement)) {
+	parseDom(domElement: HTMLElement) {
+		if (domElement && this.isGoogleAnalyticsAvailable()) {
 			const elementsToTrack = [
 				...domElement.querySelectorAll(`${this.selector}:not([tracking-parsed])`)
 			]
@@ -31,7 +42,7 @@ export default class Tracking {
 	 * @param {String} key Key of tracking datas
 	 * @param {Object} replaceObj JSON with replacement keys
 	 */
-	trackPageView(key, pageView) {
+	trackPageView(key: string, pageView: any) {
 		let dataTracking = {}
 		const configEvent = this.getConfigEventFromKey(key)
 
@@ -53,7 +64,7 @@ export default class Tracking {
 	 * @param {String} key Key of tracking datas
 	 * @param {Object} replaceObj JSON with replacement keys
 	 */
-	trackEvent(key, replaceObj) {
+	trackEvent(key: string, replaceObj: any) {
 		let dataTracking = {}
 		const configEvent = this.getConfigEventFromKey(key)
 
@@ -73,14 +84,14 @@ export default class Tracking {
 	 * Function to track click event from HTML
 	 * @param {Object} e Event listener datas
 	 */
-	trackClickEvent(e) {
-		const element = e.currentTarget
-		const key = element.getAttribute('data-track-key')
+	trackClickEvent(e: Event) {
+		const element = e.currentTarget as HTMLElement
+		const key = element.getAttribute('data-track-key') || ''
 		const dataTrackParams = element.getAttribute('data-track-params')
 		const isPageView = element.hasAttribute('data-track-page-view')
 		let dataTracking = {}
 		const callbackUrl = element.getAttribute('href') || false
-		const targetAttribute = element.getAttribute('target') || false
+		const targetAttribute = element.hasAttribute('target') || false
 
 		// Prevent only when link has no target attribute
 		if (!targetAttribute) {
@@ -126,20 +137,22 @@ export default class Tracking {
 	 * @param {Object} replaceObj Replacement object from HTML
 	 * @returns {Object} Object with all replacements
 	 */
-	loopReplace(obj, replaceObj) {
+	loopReplace(obj: any, replaceObj: any) {
 		let replacedObj = {}
 
 		if (!replaceObj) {
 			replacedObj = obj
 		} else {
 			const replaceExp = new RegExp(Object.keys(replaceObj).join('|'), 'gi')
-			const replaceMatch = (matches) => replaceObj[matches]
+			const replaceMatch = (matches: string) => replaceObj[matches]
 
 			for (const key in obj) {
 				// Apply the replacement only for string value
 				if (typeof obj[key] === 'string') {
+					// @ts-ignore
 					replacedObj[key] = obj[key].replace(replaceExp, replaceMatch)
 				} else {
+					// @ts-ignore
 					replacedObj[key] = obj[key]
 				}
 			}
@@ -155,9 +168,21 @@ export default class Tracking {
 	 * @param {Object} options.json Object to send to GA
 	 * @param {(String|Boolean)} options.callbackUrl Url to redirect if necessary
 	 * @param {Boolean} options.targetAttribute Is target attribute is present on the element
-	 * @param {(Object|Boolean)} options.element Source element of the event
+	 * @param {HTMLElement} options.element Source element of the event
 	 */
-	sendEvent({ key, json = {}, callbackUrl = false, targetAttribute = false, element = false }) {
+	sendEvent({
+		key,
+		json = {},
+		callbackUrl = false,
+		targetAttribute = false,
+		element = false
+	}: {
+		key: string
+		json: any
+		callbackUrl?: string | boolean
+		targetAttribute?: boolean
+		element?: boolean | HTMLElement
+	}) {
 		console.log('%c[Tracking -> trackEvent]:', 'color: DeepPink;', key, json, {
 			callbackUrl,
 			targetAttribute,
@@ -172,6 +197,7 @@ export default class Tracking {
 			})
 		) {
 			json.hitCallback = () => {
+				// @ts-ignore
 				window.location.assign(callbackUrl)
 			}
 		}
@@ -184,7 +210,7 @@ export default class Tracking {
 	 * @param {String} options.key Key of tracking datas
 	 * @param {Object} options.json Object to send to GA
 	 */
-	sendPageView({ key, json }) {
+	sendPageView({ key, json }: { key: string; json: any }) {
 		console.log('%c[Tracking -> trackPageView]:', 'color: DeepPink;', key, json)
 
 		if (json.pageView) {
@@ -197,7 +223,7 @@ export default class Tracking {
 	 * Check if Google Analytics is available on the page
 	 * @return {Boolean} Is Google Analytics available
 	 */
-	isGoogleAnalyticsAvailable() {
+	isGoogleAnalyticsAvailable(): boolean {
 		return typeof window.ga !== 'undefined'
 	}
 
@@ -207,25 +233,32 @@ export default class Tracking {
 	 * @param {String} key Tracking configuration key
 	 * @return {Object} Tracking configuration datas
 	 */
-	getConfigEventFromKey(key) {
-		return key
-			.split('.')
-			.reduce((accumulator, currentValue) => accumulator[currentValue], this.config)
+	getConfigEventFromKey(key: string): any {
+		return this.config[key]
 	}
 
 	/**
 	 * Check if redirect is needed after the event
 	 * @param {Object} options Options parameters
-	 * @param {HTMLElement} options.callbackUrl The HTML element which trigger the event
-	 * @param {HTMLElement} options.targetAttribute The HTML element which trigger the event
 	 * @param {HTMLElement} options.element The HTML element which trigger the event
+	 * @param {(String|Boolean)} options.callbackUrl The HTML element which trigger the event
+	 * @param {HTMLElement} options.targetAttribute The HTML element which trigger the event
 	 */
-	needRedirectAfterEvent({ callbackUrl, targetAttribute, element }) {
+	needRedirectAfterEvent({
+		element,
+		callbackUrl,
+		targetAttribute
+	}: {
+		element: HTMLElement | boolean
+		callbackUrl: string | boolean
+		targetAttribute: boolean
+	}): boolean {
 		return !!(
 			callbackUrl &&
 			callbackUrl !== '' &&
 			callbackUrl !== '#' &&
 			!targetAttribute &&
+			// @ts-ignore
 			!element.hasAttribute(this.ignoreRedirectAttribute)
 		)
 	}

@@ -5,16 +5,13 @@ const TrackingManager = (await import('../src/index')).default
 
 let trackingManager
 const configTracking = {
-	header: {
-		burgerMenu_onClick: {
-			hitType: 'event',
-			eventCategory: 'header',
-			eventAction: 'display',
-			eventLabel: 'burger menu - {user} {isConnected}',
-			nonInteraction: true
-		}
+	burgerMenu_onClick: {
+		hitType: 'event',
+		eventCategory: 'header',
+		eventAction: 'display',
+		eventLabel: 'burger menu - {user} {isConnected}',
+		nonInteraction: true
 	},
-
 	newsInfiniteScroll: {
 		pageView: '{pageView}'
 	}
@@ -44,7 +41,7 @@ beforeEach(() => {
 				target="_blank"
 				class="track-link"
 				data-track
-				data-track-key="header.burgerMenu_onClick"
+				data-track-key="burgerMenu_onClick"
 				data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
 			></a>
 			<a
@@ -52,7 +49,7 @@ beforeEach(() => {
 				target="_blank"
 				class="track-link-without-params"
 				data-track
-				data-track-key="header.burgerMenu_onClick"
+				data-track-key="burgerMenu_onClick"
 			></a>
 			<a
 				href="http://www.google.fr"
@@ -65,7 +62,7 @@ beforeEach(() => {
 			<button
 				class="track-button"
 				data-track
-				data-track-key="header.burgerMenu_onClick"
+				data-track-key="burgerMenu_onClick"
 				data-track-params='{"{isConnected}": "true","{user}": "Jest"}'
 			></button>
 		</div>
@@ -166,7 +163,7 @@ describe('TrackingManager trackPageView', () => {
 
 describe('TrackingManager trackEvent', () => {
 	it('Should call the trackEvent function', () => {
-		const key = 'header.burgerMenu_onClick'
+		const key = 'burgerMenu_onClick'
 
 		mockGetConfigEventFromKey({ trackingManager, key, configTracking })
 		trackingManager.sendEvent = jest.fn()
@@ -196,7 +193,7 @@ describe('TrackingManager trackEvent', () => {
 
 describe('TrackingManager trackClickEvent', () => {
 	it('Should call the trackClickEvent function with a button', () => {
-		const key = 'header.burgerMenu_onClick'
+		const key = 'burgerMenu_onClick'
 		const element = document.querySelector('.track-button')
 
 		mockGetConfigEventFromKey({ trackingManager, key, configTracking })
@@ -220,7 +217,7 @@ describe('TrackingManager trackClickEvent', () => {
 	})
 
 	it('Should call the trackClickEvent function with a link', () => {
-		const key = 'header.burgerMenu_onClick'
+		const key = 'burgerMenu_onClick'
 		const element = document.querySelector('.track-link')
 
 		mockGetConfigEventFromKey({ trackingManager, key, configTracking })
@@ -237,13 +234,13 @@ describe('TrackingManager trackClickEvent', () => {
 			key,
 			json: jsonEvent,
 			callbackUrl: 'http://www.google.fr',
-			targetAttribute: '_blank',
+			targetAttribute: true,
 			element
 		})
 	})
 
 	it('Should call the trackClickEvent function with a link with parameters', () => {
-		const key = 'header.burgerMenu_onClick'
+		const key = 'burgerMenu_onClick'
 		const element = document.querySelector('.track-link-without-params')
 
 		mockGetConfigEventFromKey({ trackingManager, key, configTracking })
@@ -257,9 +254,9 @@ describe('TrackingManager trackClickEvent', () => {
 
 		expect(trackingManager.sendEvent).toHaveBeenCalledWith({
 			key,
-			json: configTracking.header.burgerMenu_onClick,
+			json: configTracking.burgerMenu_onClick,
 			callbackUrl: 'http://www.google.fr',
-			targetAttribute: '_blank',
+			targetAttribute: true,
 			element
 		})
 	})
@@ -286,7 +283,7 @@ describe('TrackingManager trackClickEvent', () => {
 
 describe('TrackingManager loopReplace', () => {
 	it('Should call the loopReplace function', () => {
-		const objectReference = configTracking.header.burgerMenu_onClick
+		const objectReference = configTracking.burgerMenu_onClick
 		const objectReplace = document.querySelector('.track-button').getAttribute('data-track-params')
 		const result = trackingManager.loopReplace(objectReference, JSON.parse(objectReplace))
 
@@ -294,7 +291,7 @@ describe('TrackingManager loopReplace', () => {
 	})
 
 	it('Should call the loopReplace function without replace object', () => {
-		const objectReference = configTracking.header.burgerMenu_onClick
+		const objectReference = configTracking.burgerMenu_onClick
 		const result = trackingManager.loopReplace(objectReference)
 
 		expect(result).toMatchObject(objectReference)
@@ -303,7 +300,7 @@ describe('TrackingManager loopReplace', () => {
 
 describe('TrackingManager sendEvent', () => {
 	it('Initialize the sendEvent function', () => {
-		const key = 'header.burgerMenu_onClick'
+		const key = 'burgerMenu_onClick'
 		const callbackUrl = 'http://www.google.fr'
 		const element = document.querySelector('.track-link')
 		const targetAttribute = '_blank'
@@ -353,7 +350,7 @@ describe('TrackingManager sendEvent', () => {
 		window.ga = jest.fn()
 
 		trackingManager.sendEvent({
-			key: 'header.burgerMenu_onClick',
+			key: 'burgerMenu_onClick',
 			json: jsonEvent,
 			callbackUrl,
 			targetAttribute: false,
@@ -376,7 +373,7 @@ describe('TrackingManager sendEvent', () => {
 		window.ga = jest.fn()
 
 		trackingManager.sendEvent({
-			key: 'header.burgerMenu_onClick'
+			key: 'burgerMenu_onClick'
 		})
 
 		expect(trackingManager.needRedirectAfterEvent).toHaveBeenCalledWith({
@@ -394,14 +391,14 @@ describe('TrackingManager sendPageView', () => {
 		console.log = jest.fn()
 
 		trackingManager.sendPageView({
-			key: 'header.burgerMenu_onClick',
+			key: 'burgerMenu_onClick',
 			json: jsonPageView
 		})
 
 		expect(console.log).toBeCalledWith(
 			'%c[Tracking -> trackPageView]:',
 			'color: DeepPink;',
-			'header.burgerMenu_onClick',
+			'burgerMenu_onClick',
 			jsonPageView
 		)
 		expect(window.ga).toHaveBeenCalledWith('set', 'page', 'Home')
@@ -413,7 +410,7 @@ describe('TrackingManager sendPageView', () => {
 		console.log = jest.fn()
 
 		trackingManager.sendPageView({
-			key: 'header.burgerMenu_onClick',
+			key: 'burgerMenu_onClick',
 			json: {}
 		})
 
@@ -435,9 +432,9 @@ describe('TrackingManager isGoogleAnalyticsAvailable', () => {
 
 describe('TrackingManager getConfigEventFromKey', () => {
 	it('Should call the getConfigEventFromKey function', () => {
-		const result = trackingManager.getConfigEventFromKey('header.burgerMenu_onClick')
+		const result = trackingManager.getConfigEventFromKey('burgerMenu_onClick')
 
-		expect(result).toBe(configTracking.header.burgerMenu_onClick)
+		expect(result).toBe(configTracking.burgerMenu_onClick)
 	})
 })
 
