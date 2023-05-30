@@ -15,7 +15,7 @@
 	"license": "MIT",
 	"author": "Yoriiis aka Joris DANIEL",
 	"type": "module",
-	"main": "src/index.js",
+	"main": "lib/index.js",
 	"files": [
 		"lib",
 		"types"
