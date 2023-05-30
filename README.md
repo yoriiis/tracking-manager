@@ -1,6 +1,6 @@
 # trackingManager
 
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/yoriiis/dtracking-manager/build.yml?branch=main&style=for-the-badge)](https://github.com/yoriiis/dtracking-manager/actions/workflows/build.yml) [![Coverage Status](https://img.shields.io/coveralls/github/yoriiis/dtracking-manager?style=for-the-badge)](https://coveralls.io/github/yoriiis/dtracking-manager?branch=main)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/yoriiis/tracking-manager/build.yml?branch=main&style=for-the-badge)](https://github.com/yoriiis/tracking-manager/actions/workflows/build.yml) [![Coverage Status](https://img.shields.io/coveralls/github/yoriiis/tracking-manager?style=for-the-badge)](https://coveralls.io/github/yoriiis/tracking-manager?branch=main)
 
 The `tracking-manager` allows to manage all your Google Analytics events directly in HTML or Javascript with a simple and extensible configuration and public functions to track events with dynamic variables. The concept is compatible with a site with a large number of events to manage.
 
